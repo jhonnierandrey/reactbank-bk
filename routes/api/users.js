@@ -12,6 +12,10 @@ const path = require('path');
 // router.post('/login',usersController.login);
 // router.get('/:id',authenticationMiddleware,usersController.find);
 
+// CURRENT USERS
+//router.get('/login', usersController.login);
+router.post('/login', usersController.login);
+
 // NEW MEMBERS 
 //router.get('/register', usersController.register);
 router.post('/register', [
@@ -29,14 +33,11 @@ router.post('/register', [
     }).withMessage('User is already in our database'),
   ], usersController.register);
 
-// CURRENT USERS
-//router.get('/login', usersController.login);
-router.post('/login', usersController.login);
 
 router.get('/logout',usersController.logout);
 
 // USERS DASHBOARD 
-//router.get('/account', usersController.account);
+router.get('/account', usersController.account);
 
 //router.get('/account/update', usersController.update);
 router.post('/account/update', usersController.storeUpdate);
