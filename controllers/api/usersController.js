@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-var {check, validationResult, body} = require('express-validator');
+const {check, validationResult, body} = require('express-validator');
+const bcrypt = require('bcrypt');
 
 const usersFilePath = path.join(__dirname, '../../data/users.json');
 const users = JSON.parse(fs.readFileSync(usersFilePath, 'utf-8'));
@@ -12,24 +13,25 @@ const usersController = {
                 return user.email === req.body.email;
             })
             if(userLogin !== undefined){
-                if(req.body.password === userLogin.password){
+                if(bcrypt.compareSync(req.body.password,userLogin.password)){
+                    req.session.currentUser = userLogin;
                     res.status(200).json({
-                        message : 'User Logged In'
+                        msg : 'User Logged In'
                     });
                 }
                 else{
                     res.status(403).json({
-                        message : 'User or password incorrect.'
+                        msg : 'User or password incorrect.'
                     });
                 }
             }else{
                 res.status(403).json({
-                    message : 'User or password incorrect.'
+                    msg : 'User or password incorrect.'
                 });
             }
         }else{
             res.status(403).json({
-                message : 'User or password incorrect.'
+                msg : 'User or password incorrect.'
             });
         }
     },
@@ -38,26 +40,27 @@ const usersController = {
 
         if(errors.isEmpty()){
             let newId = users.length + 1;
+            let accountDefault = {
+                available : 5000,
+                transactions: {}
+            }
             let newUser = {
                 id: newId,
                 name : req.body.firstName,
                 lastName : req.body.lastName,
                 email: req.body.email,
-                password: req.body.password,
-                birth: req.body.birth
+                password: bcrypt.hashSync(req.body.password, 10),
+                birth: req.body.birth,
+                accountData : accountDefault
             }
 
             const newUsers = [...users, newUser];
             fs.writeFileSync(usersFilePath, JSON.stringify(newUsers, null, ' '));
             
             res.status(201).json({
-                message : 'User created'
+                msg : 'User created'
             });
         }else{
-            // return res.render('register',{
-            //     errors:errors.errors,
-            //     title:'Modas Emilse | Login'
-            // })
             res.status(403).json({
                 errors : errors.errors,
             });
@@ -70,10 +73,22 @@ const usersController = {
         res.send('StoreUpdate')
     },
     account : (req, res) => {
-        res.send('Account');
+        if(req.session.currentUser){
+            res.send(`Account Logged: ${req.session.currentUser.name}`);
+        }else{
+            res.json(`Please login to access your information.`)
+        }
     },
     logout: (req, res) => {
-        res.send('Log Out')
+        if(req.session.currentUser){
+            let loggedOut = req.session.currentUser.name;
+        
+            req.session.destroy();
+            res.cookie('color',null,{maxAge:-1});
+            res.json(`${loggedOut} is now Log Out`)
+        }else{
+            res.json(`There aren't current sessions active.`)
+        }
     }
 }
 
