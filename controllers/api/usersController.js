@@ -69,12 +69,36 @@ const usersController = {
     update : (req, res) => {
         res.send('Update');
     },
-    storeUpdate : (req, res) => {
-        res.send('StoreUpdate')
+    balanceUpdate : (req, res) => {
+        if(req.session.currentUser){
+            let userToUpdate = users.find(user => {
+                return user.email === req.session.currentUser.email;
+            })
+            if(userToUpdate != undefined){
+                if(req.body.wdw <= userToUpdate.accountData.available){
+                    const newUsers = users.map(user =>{
+                        if(user.email == userToUpdate.email){
+                            user.accountData.available -= req.body.wdw;
+                        }
+                        req.session.currentUser = user;
+                        return user;
+                    });
+                    fs.writeFileSync(usersFilePath,JSON.stringify( newUsers, null, ' '));
+                    res.redirect('/api/account');
+                }else{
+                    res.json("We can't withdrawal, not enough founds");
+                }
+            }else{
+                res.json(`Internal issue`)
+            }
+        }else{
+            res.json(`Please login to access your information.`)
+        }
     },
     account : (req, res) => {
         if(req.session.currentUser){
-            res.send(`Account Logged: ${req.session.currentUser.name}`);
+            const {name, lastName, accountData, email} = req.session.currentUser;
+            res.send(`Account Logged: ${name} ${lastName} (${email}) | Available: ${accountData.available}`);
         }else{
             res.json(`Please login to access your information.`)
         }
@@ -84,7 +108,6 @@ const usersController = {
             let loggedOut = req.session.currentUser.name;
         
             req.session.destroy();
-            res.cookie('color',null,{maxAge:-1});
             res.json(`${loggedOut} is now Log Out`)
         }else{
             res.json(`There aren't current sessions active.`)
