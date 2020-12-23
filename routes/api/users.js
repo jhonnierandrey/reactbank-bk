@@ -13,11 +13,9 @@ const path = require('path');
 // router.get('/:id',authenticationMiddleware,usersController.find);
 
 // CURRENT USERS
-//router.get('/login', usersController.login);
 router.post('/login', usersController.login);
 
 // NEW MEMBERS 
-//router.get('/register', usersController.register);
 router.post('/register', [
     check('password').isLength({min:5}).withMessage('Password must contain more than 5 characters'),
     check('email').isEmail().withMessage('Invalid email address'),
@@ -39,8 +37,11 @@ router.get('/logout',usersController.logout);
 // USERS DASHBOARD 
 router.get('/account', usersController.account);
 
-//router.get('/account/update', usersController.update);
-router.post('/account/update', usersController.storeUpdate);
+// UPDATE USER BALANCE:
+router.post('/account/balance-update', usersController.balanceUpdate);
+
+// UPDATE USER DATA
+//router.post('/account/update', usersController.storeUpdate);
 
 
 module.exports = router;
