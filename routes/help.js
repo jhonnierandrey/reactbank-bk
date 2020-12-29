@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('help', { title: 'ReactBank API > Help' });
+  res.render('help', { title: 'ReactBank API' });
 });
 
 module.exports = router;
