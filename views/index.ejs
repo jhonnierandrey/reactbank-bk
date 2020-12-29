@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
+<html lang="en">
+  <%- include('./partials/head') %> 
   <body>
-    <%- include('./partials/header') %> 
-    <h1><%= title %></h1>
-    <hr>
-    <p>Welcome to <%= title %></p>
-    <h2>Currently supported request via <code>POST</code></h2>
-    <ul>
-      <li><a href="/help#register">api/register</a></li>
-      <li><a href="/help#login">api/login</a></li>
-    </ul>
+    <div class="container">
+      <%- include('./partials/header') %> 
+      <section class="home">
+        <h1><%= title %> <img class="rb-logo" src="/images/logo192.png" alt=""></h1>
+        <hr>
+        <p>Welcome to <%= title %></p>
+        <h2>Currently supported request via <code>POST</code></h2>
+        <ul>
+          <li><a href="/help#register">api/register</a></li>
+          <li><a href="/help#login">api/login</a></li>
+        </ul>
+      </section>
+      <%- include('./partials/footer') %> 
+    </div>
   </body>
 </html>
