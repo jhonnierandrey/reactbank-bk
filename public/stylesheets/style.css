@@ -53,8 +53,12 @@ header {
   font-size: large;
 }
 
-.home, .help {
+.home {
   height: inherit;
+}
+
+.help {
+  height: auto;
 }
 
 footer {
