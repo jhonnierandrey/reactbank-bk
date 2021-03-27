@@ -97,8 +97,17 @@ const usersController = {
     },
     account : (req, res) => {
         if(req.session.currentUser){
-            const {name, lastName, accountData, email} = req.session.currentUser;
-            res.send(`Account Logged: ${name} ${lastName} (${email}) | Available: ${accountData.available}`);
+            const {name, lastName, email, accountData} = req.session.currentUser;
+            res.status(200).json({
+                msg : 'User created',
+                userData : {
+                    name : name,
+                    lastName : lastName,
+                    email : email,
+                    accountData : accountData,
+                }
+            });
+            // res.send(`Account Logged: ${name} ${lastName} (${email}) | Available: ${accountData.available}`);
         }else{
             res.json(`Please login to access your information.`)
         }
