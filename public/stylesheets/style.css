@@ -6,3 +6,13 @@ body {
 a {
   color: #00B7FF;
 }
+
+a:hover {
+  color: hsl(197, 100%, 25%);
+}
+
+footer {
+  position: absolute;
+  bottom: -1px;
+  color: hsl(0, 0%, 40%);
+}
