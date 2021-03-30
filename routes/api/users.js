@@ -6,7 +6,7 @@ const { check, validationResult, body } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
 
-//const authenticationMiddleware = require('../../middleware/api/authentication');
+const authMiddleware = require('../../middlewares/api/authentication');
 
 // router.get('/',authenticationMiddleware, usersController.list);
 // router.post('/login',usersController.login);
@@ -35,7 +35,7 @@ router.post('/register', [
 router.get('/logout',usersController.logout);
 
 // USERS DASHBOARD 
-router.get('/account', usersController.account);
+router.get('/account', authMiddleware, usersController.account);
 
 // UPDATE USER BALANCE:
 router.post('/account/balance-update', usersController.balanceUpdate);
