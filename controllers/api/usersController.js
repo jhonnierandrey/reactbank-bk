@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const {check, validationResult, body} = require('express-validator');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const usersFilePath = path.join(__dirname, '../../data/users.json');
 const users = JSON.parse(fs.readFileSync(usersFilePath, 'utf-8'));
@@ -14,9 +15,20 @@ const usersController = {
             })
             if(userLogin !== undefined){
                 if(bcrypt.compareSync(req.body.password,userLogin.password)){
+                    let secret = process.env.JWT_SECRET;
+                    // creating the token
+                    const token = jwt.sign(
+                            {userLogin}, secret, {
+                                expiresIn : 300,
+                            }
+                        )
+
                     req.session.currentUser = userLogin;
+
+                    // return token to user
                     res.status(200).json({
-                        msg : 'User Logged In'
+                        msg : 'User Logged In',
+                        token : token
                     });
                 }
                 else{
@@ -96,10 +108,10 @@ const usersController = {
         }
     },
     account : (req, res) => {
-        if(req.session.currentUser){
-            const {name, lastName, email, accountData} = req.session.currentUser;
+        if(req.currentUser){
+            const {name, lastName, email, accountData} = req.currentUser;
             res.status(200).json({
-                msg : 'User created',
+                msg : 'User data',
                 userData : {
                     name : name,
                     lastName : lastName,
