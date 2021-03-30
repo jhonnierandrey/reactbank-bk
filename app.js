@@ -1,5 +1,8 @@
 var createError = require('http-errors');
 var express = require('express');
+
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -11,11 +14,13 @@ const apiUsersRouter = require('./routes/api/users');
 
 var app = express();
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+app.use(cors({ origin: '*'}))
+
+// app.use(function(req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//   next();
+// });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
