@@ -64,7 +64,7 @@ def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):
         e = InternalServerError()
-    return render_template(name = e.name, code = e.code)
+    return render_template("error.html",name = e.name, code = e.code)
 
 
 # Listen for errors
