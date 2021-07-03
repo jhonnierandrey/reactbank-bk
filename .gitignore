@@ -4,4 +4,4 @@ nodejs/
 .DS_Store
 node_modules/
 .env
-.db
+*.db
