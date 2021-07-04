@@ -1,5 +1,6 @@
 #dependencies
 
+__pycache__/
 nodejs/
 .DS_Store
 node_modules/
