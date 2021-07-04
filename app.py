@@ -5,6 +5,7 @@ from threading import current_thread
 import sqlite3
 from flask import Flask, flash, redirect, render_template, request, session, sessions, jsonify
 from flask_session import Session
+from flask_cors import CORS, cross_origin
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -13,6 +14,7 @@ from helpers import login_required, lookup, usd
 
 # Configure application
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -24,6 +26,7 @@ def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
+    response.headers['Access-Control-Allow-Credentials'] = True
     return response
 
 
@@ -67,18 +70,15 @@ db = con.cursor()
 # api index for help / docs
 @app.route("/")
 def index():
-    """Show portfolio of stocks"""
     return render_template('index.html', title='ReactBank API')
 
 @app.route("/help")
 def help():
-    """Show portfolio of stocks"""
     return render_template('help.html', title='ReactBank API > Help')
 
 # api routes 
 @app.route("/api")
 def api_check():
-    """Show portfolio of stocks"""
     return jsonify(msg='All systems are operational.'), 200
 
 @app.route('/api/register', methods=['POST'])
@@ -131,8 +131,6 @@ def login():
 
     # Query database for email
     rows = db.execute("SELECT * FROM users WHERE email = ?;", [request.form.get('email')]).fetchall()
-
-    print('login rows result =', rows[0]['name'])
 
     # Ensure username exists and password is correct
     if len(rows) != 1 or not check_password_hash(rows[0]["password"], request.form.get("password")):
