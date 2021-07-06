@@ -3,7 +3,7 @@ from sqlite3.dbapi2 import connect
 from threading import current_thread
 
 import sqlite3
-from flask import Flask, flash, redirect, render_template, request, session, sessions, jsonify
+from flask import Flask, flash, json, redirect, render_template, request, session, sessions, jsonify
 from flask_session import Session
 from flask_cors import CORS, cross_origin
 from tempfile import mkdtemp
@@ -50,6 +50,7 @@ def sql_connection():
 def sql_table(con):
     temp_db = con.cursor()
     
+    # checks if tables exists on current db
     temp_db.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER, name TEXT NOT NULL, lastName TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL, balance NUMERIC NOT NULL DEFAULT 1000.00, PRIMARY KEY(id));')
     temp_db.execute('CREATE UNIQUE INDEX IF NOT EXISTS email ON users (email);')
     temp_db.execute('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, amount NUMERIC NOT NULL, type TEXT NOT NULL, description TEXT NOT NULL, time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id));')
@@ -60,7 +61,6 @@ sql_table(con)
 
 db = con.cursor()
 
-# checks if tables exists on current db
 
 # Make sure API key is set
 # if not os.environ.get("API_KEY"):
@@ -155,6 +155,78 @@ def account():
     }
 
     return jsonify(msg='User data', userData = user_data), 200
+
+@app.route('/api/account/transactions', methods=['POST'])
+@login_required
+def transactions():
+    # checks for active sessions
+    get_user_transactions = db.execute('SELECT * FROM transactions WHERE user_id = ?', [session["user_id"]]).fetchall()
+
+    user_transactions = []
+
+    for row in get_user_transactions:
+        user_transactions.append({
+            'id' : row['id'],
+            'type' : row['type'],
+            'description' : row['description'],
+            'amount' : usd(row['amount']),
+            'time' : row['time'],
+        })
+
+    # print(user_transactions)
+
+    # user_data = {
+    #     'name' : get_user_data['name'],
+    #     'lastName' : get_user_data['lastName'],
+    #     'email' : get_user_data['email'],
+    #     'balance' : usd(get_user_data['balance'])
+    # }
+
+    return jsonify(msg='User transactions', userTransactions = user_transactions), 200
+
+@app.route('/api/account/wdw', methods=['POST'])
+@login_required
+def withdrawal():
+    # checks for active sessions
+    get_user_data = db.execute('SELECT * FROM users WHERE id = ?', [session["user_id"]]).fetchone()
+
+    # check user input for withdrawal amount
+    if not request.form.get('withdrawal'):
+        return jsonify(mgs = 'Missing amount to withdrawal'), 400
+
+    # checks shares = positive int
+    elif not request.form.get('withdrawal').isdigit() or int(request.form.get('withdrawal')) < 0:
+        return jsonify(mgs = 'Invalid amount to withdrawal'), 400
+
+    if get_user_data['balance'] >= int(request.form.get('withdrawal')):
+        # update current user cash
+        db.execute('UPDATE users SET balance = ? WHERE id = ?', (get_user_data['balance'] - int(request.form.get('withdrawal')), session["user_id"]))
+
+        # create the new transaction
+        db.execute('INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)', (session["user_id"], int(request.form.get('withdrawal')), 'Debit', 'Withdrawal from account'))
+        con.commit()
+
+        # get updated user data and return it
+        get_user_data = db.execute('SELECT * FROM users WHERE id = ?', [session["user_id"]]).fetchone()
+        
+        user_data = {
+            'name' : get_user_data['name'],
+            'lastName' : get_user_data['lastName'],
+            'email' : get_user_data['email'],
+            'balance' : usd(get_user_data['balance'])
+        }
+
+        return jsonify(msg='Withdrawal completed', userData = user_data), 200
+    else:
+        return jsonify(msg='Not enough money'), 400
+
+    # user_data = {
+    #     'name' : get_user_data['name'],
+    #     'lastName' : get_user_data['lastName'],
+    #     'email' : get_user_data['email'],
+    #     'balance' : usd(get_user_data['balance'])
+    # }
+    
 
 
 @app.route("/api/logout", methods=['GET', 'POST'])
