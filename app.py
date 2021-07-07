@@ -61,11 +61,6 @@ sql_table(con)
 
 db = con.cursor()
 
-
-# Make sure API key is set
-# if not os.environ.get("API_KEY"):
-#     raise RuntimeError("API_KEY not set")
-
 # api index for help / docs
 @app.route("/")
 def index():
@@ -160,7 +155,7 @@ def account():
 @login_required
 def transactions():
     # checks for active sessions
-    get_user_transactions = db.execute('SELECT * FROM transactions WHERE user_id = ?', [session["user_id"]]).fetchall()
+    get_user_transactions = db.execute('SELECT * FROM transactions WHERE user_id = ? ORDER BY id DESC', [session["user_id"]]).fetchall()
 
     user_transactions = []
 
@@ -172,15 +167,6 @@ def transactions():
             'amount' : usd(row['amount']),
             'time' : row['time'],
         })
-
-    # print(user_transactions)
-
-    # user_data = {
-    #     'name' : get_user_data['name'],
-    #     'lastName' : get_user_data['lastName'],
-    #     'email' : get_user_data['email'],
-    #     'balance' : usd(get_user_data['balance'])
-    # }
 
     return jsonify(msg='User transactions', userTransactions = user_transactions), 200
 
@@ -220,14 +206,90 @@ def withdrawal():
     else:
         return jsonify(msg='Not enough money'), 400
 
-    # user_data = {
-    #     'name' : get_user_data['name'],
-    #     'lastName' : get_user_data['lastName'],
-    #     'email' : get_user_data['email'],
-    #     'balance' : usd(get_user_data['balance'])
-    # }
-    
+@app.route('/api/account/transfer', methods=['POST'])
+@login_required
+def transfer():
+    # checks for active sessions
+    get_user_data = db.execute('SELECT * FROM users WHERE id = ?', [session["user_id"]]).fetchone()
 
+    # check user input for email amount
+    if not request.form.get('email'):
+        return jsonify(mgs = 'Recipient\'s email address is missing.'), 400
+    
+    # check user input for transfer amount
+    elif not request.form.get('transfer'):
+        return jsonify(mgs = 'Missing amount to transfer'), 400
+
+    # checks shares = positive int
+    elif not request.form.get('transfer').isdigit() or int(request.form.get('transfer')) < 0:
+        return jsonify(mgs = 'Invalid amount to transfer'), 400
+
+    if get_user_data['balance'] >= int(request.form.get('transfer')):
+        # verify recipient's account exits
+        get_user_receptor = db.execute('SELECT * FROM users WHERE email = ?', [request.form.get('email')]).fetchone()
+
+        if get_user_receptor:
+            # update current user balance
+            db.execute('UPDATE users SET balance = ? WHERE id = ?', (get_user_data['balance'] - int(request.form.get('transfer')), session["user_id"]))
+
+            # create the new transaction for sender
+            description_sender = 'Transfer to ' + request.form.get('email')
+            db.execute('INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)', (session["user_id"], int(request.form.get('transfer')), 'Debit', description_sender))
+            con.commit()
+            
+            # update receptor user balance
+            db.execute('UPDATE users SET balance = ? WHERE id = ?', (get_user_receptor['balance'] + int(request.form.get('transfer')), get_user_receptor['id']))
+            
+            # create the new transaction for receptor
+            description_receptor = 'Transfer from ' + get_user_data['email']
+            db.execute('INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)', (get_user_receptor['id'], int(request.form.get('transfer')), 'Credit', description_receptor))
+            con.commit()
+
+            # get updated user data and return it
+            get_user_data = db.execute('SELECT * FROM users WHERE id = ?', [session["user_id"]]).fetchone()
+            
+            # send updated user data
+            user_data = {
+                'name' : get_user_data['name'],
+                'lastName' : get_user_data['lastName'],
+                'email' : get_user_data['email'],
+                'balance' : usd(get_user_data['balance'])
+            }
+            
+            return jsonify(msg='Transfer completed', userData = user_data), 200
+        else:
+            return jsonify(msg='User does not exist'), 200
+    else:
+        return jsonify(msg='Not enough money'), 400
+    
+@app.route('/api/account/deposit', methods=['POST'])
+@login_required
+def deposit():
+    # checks for active sessions
+    get_user_data = db.execute('SELECT * FROM users WHERE id = ?', [session["user_id"]]).fetchone()
+
+    # allow user balance to be updated if is below 250
+    if get_user_data['balance'] <= 250:
+        # update current user cash
+        db.execute('UPDATE users SET balance = ? WHERE id = ?', (get_user_data['balance'] + 1000, session["user_id"]))
+
+        # create the new transaction
+        db.execute('INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)', (session["user_id"], 1000, 'Credit', 'Deposit to account'))
+        con.commit()
+
+        # get updated user data and return it
+        get_user_data = db.execute('SELECT * FROM users WHERE id = ?', [session["user_id"]]).fetchone()
+        
+        user_data = {
+            'name' : get_user_data['name'],
+            'lastName' : get_user_data['lastName'],
+            'email' : get_user_data['email'],
+            'balance' : usd(get_user_data['balance'])
+        }
+
+        return jsonify(msg='Balance updated', userData = user_data), 200
+    else:
+        return jsonify(msg='You can reset your balance when is below $250'), 400
 
 @app.route("/api/logout", methods=['GET', 'POST'])
 def logout():
