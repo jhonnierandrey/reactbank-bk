@@ -291,6 +291,36 @@ def deposit():
     else:
         return jsonify(msg='You can reset your balance when is below $250'), 400
 
+@app.route('/api/account/update', methods=['POST'])
+@login_required
+def update():
+
+    # Ensure password was submitted
+    if not request.form.get("password"):
+        return jsonify(msg="Must provide current password"), 403
+
+    # Ensure new password was submitted
+    elif not request.form.get("passwordNew"):
+        return jsonify(msg="Must provide a new password"), 403
+
+    # check for new password match
+    elif request.form.get('passwordNew') != request.form.get('confirmation'):
+        return jsonify(msg="Passwords do not match"), 403
+
+    # Query database for user data
+    get_user_data = db.execute('SELECT * FROM users WHERE id = ?', [session["user_id"]]).fetchone()
+
+    # Ensure username exists and password is correct
+    if not check_password_hash(get_user_data["password"], request.form.get("password")):
+        return jsonify(msg="Invalid current password"), 403
+
+    # update user password
+    db.execute('UPDATE users SET password = ? WHERE id = ?', (generate_password_hash(request.form.get('passwordNew')), session["user_id"]))
+    con.commit()
+
+    # send confirmation
+    return jsonify(msg='The password has been updated'), 200
+
 @app.route("/api/logout", methods=['GET', 'POST'])
 def logout():
     """Log user out"""
