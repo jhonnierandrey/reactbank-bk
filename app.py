@@ -15,8 +15,8 @@ from helpers import login_required, usd
 # Configure application
 app = Flask(__name__)
 
-app.config['CORS_HEADERS'] = 'Content-Type'
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
+# app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app, supports_credentials=True)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -28,6 +28,7 @@ def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
+    # response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
 
