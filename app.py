@@ -15,8 +15,8 @@ from helpers import login_required, usd
 # Configure application
 app = Flask(__name__)
 
-# app.config['CORS_HEADERS'] = 'Content-Type'
-CORS(app, supports_credentials=True, resources={r"/*"}, origins=["http://localhost:3000", "https://reactbank-front-end.netlify.app"])
+CORS(app, supports_credentials=True, resources={r"/*"}, origins=["*"])
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
