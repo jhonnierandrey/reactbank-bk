@@ -15,7 +15,8 @@ from helpers import login_required, usd
 # Configure application
 app = Flask(__name__)
 
-CORS(app, supports_credentials=True, resources={r"/*"}, origins=["*"])
+CORS(app)
+# CORS(app, supports_credentials=True, resources={r"/*"}, origins=["http://localhost:3000"])
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Ensure templates are auto-reloaded
@@ -28,10 +29,10 @@ def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
-    # response.headers["Access-Control-Allow-Credentials"] = 'true'
+    response.headers["Access-Control-Allow-Credentials"] = 'true'
     # response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS, PUT, DELETE"
     # response.headers["Access-Control-Allow-Headers"] = "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
-    # response.headers["Access-Control-Allow-Origin"] = '*'
+    response.headers["Access-Control-Allow-Origin"] = 'http://localhost:3000'
     
     return response
 
@@ -43,6 +44,9 @@ app.jinja_env.filters["usd"] = usd
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_COOKIE_SECURE"] = True
+# app.config["SESSION_COOKIE_HTTPONLY"] = False
+app.config['SESSION_COOKIE_SAMESITE'] = "None"
 Session(app)
 
 # configuring the SQLite database
