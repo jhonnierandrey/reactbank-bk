@@ -1,4 +1,5 @@
 import os
+import re
 from sqlite3.dbapi2 import connect
 from threading import current_thread
 
@@ -15,7 +16,8 @@ from helpers import login_required, usd
 # Configure application
 app = Flask(__name__)
 
-CORS(app)
+# CORS(app)
+CORS(app, supports_credentials=True, resources={r"/*"}, origins=["http://localhost:3000"])
 # CORS(app, supports_credentials=True, resources={r"/*"}, origins=["http://localhost:3000"])
 app.config['CORS_HEADERS'] = 'Content-Type'
 
@@ -30,8 +32,8 @@ def after_request(response):
     req = request.headers['Origin']
     print(req)
     if req in origins_list:
-        response.headers.add('Access-Control-Allow-Origin', req)
-        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        response.headers["Access-Control-Allow-Origin"] = req
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
