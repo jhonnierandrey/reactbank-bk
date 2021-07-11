@@ -17,7 +17,7 @@ from helpers import login_required, usd
 app = Flask(__name__)
 
 # CORS(app)
-CORS(app, supports_credentials=True, resources={r"/*"}, origins=["http://localhost:3000"])
+CORS(app, supports_credentials=True, resources={r"/*"}, origins=["http://localhost:3000", "https://reactbank-front-end.netlify.app"])
 # CORS(app, supports_credentials=True, resources={r"/*"}, origins=["http://localhost:3000"])
 app.config['CORS_HEADERS'] = 'Content-Type'
 
@@ -29,8 +29,8 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 @app.after_request
 def after_request(response):
     # origins_list = ['http://localhost:3000', 'https://reactbank-front-end.netlify.app']
-    response.headers["Access-Control-Allow-Origin"] = request.headers['Origin']
-    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    # response.headers["Access-Control-Allow-Origin"] = '*'
+    # response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
