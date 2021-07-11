@@ -27,7 +27,8 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 @app.after_request
 def after_request(response):
     origins_list = ['http://localhost:3000', 'https://reactbank-front-end.netlify.app']
-    req = request.referrer[:-1]
+    req = request.headers['Origin']
+    print(req)
     if req in origins_list:
         response.headers.add('Access-Control-Allow-Origin', req)
         response.headers.add('Access-Control-Allow-Credentials', 'true')
