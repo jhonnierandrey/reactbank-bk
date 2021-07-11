@@ -27,11 +27,10 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 @app.after_request
 def after_request(response):
     origins_list = ['http://localhost:3000', 'https://reactbank-front-end.netlify.app']
-    if request.headers['Origin'] in origins_list:
-        response.headers['Access-Control-Allow-Origin'] = request.headers['Origin'] 
-        response.headers['Access-Control-Allow-Methods'] = 'PUT,GET,POST,DELETE'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-        response.headers["Access-Control-Allow-Credentials"] = 'true'
+    req = request.referrer[:-1]
+    if req in origins_list:
+        response.headers.add('Access-Control-Allow-Origin', req)
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
