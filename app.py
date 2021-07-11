@@ -28,12 +28,9 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 # Ensure responses aren't cached
 @app.after_request
 def after_request(response):
-    origins_list = ['http://localhost:3000', 'https://reactbank-front-end.netlify.app']
-    req = request.headers['Origin']
-    print(req)
-    if req in origins_list:
-        response.headers["Access-Control-Allow-Origin"] = req
-        response.headers['Access-Control-Allow-Credentials'] = 'true'
+    # origins_list = ['http://localhost:3000', 'https://reactbank-front-end.netlify.app']
+    response.headers["Access-Control-Allow-Origin"] = request.headers['Origin']
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
