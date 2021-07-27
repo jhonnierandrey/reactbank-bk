@@ -42,8 +42,8 @@ app.jinja_env.filters["usd"] = usd
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_COOKIE_SECURE"] = True
-app.config['SESSION_COOKIE_SAMESITE'] = "None"
+# app.config["SESSION_COOKIE_SECURE"] = True
+# app.config['SESSION_COOKIE_SAMESITE'] = "None"
 Session(app)
 
 # configuring the SQLite database
