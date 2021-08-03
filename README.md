@@ -5,7 +5,7 @@
 <p>David, Doug, Brian, you guys really enjoy teaching and we can feel it with every lecture, thank you for that willingness to share what you know, really appreciate it.</p>
 <p> This project was inspired by CS50 Financial practice, I created this FullStack App that uses a ReactJS FrontEnd, also some great technologies such as: Bootstrap, CSS, SCSS and JavaScript. </p>
 
-<p>For the BackEnd, Python Flask BackEnd with the following available end points: </p>
+<p>For the BackEnd, Python Flask BackEnd with the following available endpoints: </p>
 
 <br>
 
@@ -14,19 +14,19 @@
 - / : Main page with Flask views working as a "docs" web site to understand the API.
 - /help : Docs/ information about the API
 - /api/ : Shows status of the API
-- /api/register : End point to create users.
-- /api/login : End point to login users.
 
 ## POST Endpoints:
-- /api/account : End point to get user data after user are logged in.
-- /api/account/transactions : End point to get list of user's transactions.
-- /api/account/wdw : End point that allow users to "withdrawal" money from their account.
-- /api/account/transfer : End point that allow users to "transfer" money from their account to another (created) account.
-- /api/account/deposit : End point that allow users to "deposit" to their account once the current balance is below $250.
-- /api/account/update : End point that allow users to update their current password.
+- /api/register : Endpoint to create users.
+- /api/login : Endpoint to login users.
+- /api/account : Endpoint to get user data after users are logged in.
+- /api/account/transactions : Endpoint to get list of user's transactions.
+- /api/account/wdw : Endpoint that allows users to "withdrawal" money from their account.
+- /api/account/transfer : Endpoint that allows users to "transfer" money from their account to another (created) account.
+- /api/account/deposit : Endpoint that allows users to "deposit" to their account once the current balance is below $250.
+- /api/account/update : Endpoint that allows users to update their current password.
 
 ## GET/POST Endpoints:
-- /api/logout : End point that clears current session and log out users.
+- /api/logout : Endpoint that clears current session and log out users.
 
 
 I will be updating this app, deployed version will be soon available through :

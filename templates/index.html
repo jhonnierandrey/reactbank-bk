@@ -7,10 +7,26 @@
     <h1>{{ title }}</h1>
     <hr>
     <p>Welcome to {{ title }}></p>
-    <h2>Currently supported request via <code>POST</code></h2>
+    <h2><code>GET</code> Endpoints</h2>
     <ul>
-        <li><a href="/help#register">api/register</a></li>
-        <li><a href="/help#login">api/login</a></li>
+        <li><a href="/">/</a> :  Main page with Flask views working as a "docs" web site to understand the API.</li>
+        <li><a href="/help">/help</a> : Docs/ information about the API</li>
+        <li><a href="/api">/api</a> : Shows status of the API</li>
+    </ul>
+    <h2><code>POST</code> Endpoints</h2>
+    <ul>
+        <li><a href="/help#register">/api/register</a> : Endpoint to create users.</li>
+        <li><a href="/help#login">/api/login</a> : Endpoint to login users</li>
+        <li><a href="/help#account">/api/account</a> : Endpoint to get user data after users are logged in.</li>
+        <li><a href="/help#account-transactions">/api/account/transactions</a> : Endpoint to get list of user's transactions.</li>
+        <li><a href="/help#account-wdw">/api/account/wdw</a> : Endpoint that allows users to "withdrawal" money from their account.</li>
+        <li><a href="/help#account-transfer">/api/account/transfer</a> : Endpoint that allows users to "transfer" money from their account to another (created) account.</li>
+        <li><a href="/help#account-deposit">/api/account/deposit</a> : Endpoint that allows users to "deposit" to their account once the current balance is below $250.</li>
+        <li><a href="/help#account-update">/api/account/update</a> : Endpoint that allows users to update their current password.</li>
+    </ul>
+    <h2><code>GET/POST</code> Endpoints</h2>
+    <ul>
+        <li><a href="/help#logout">/api/logout</a> : Endpoint that clears current session and log out users.</li>
     </ul>
 
 {% endblock %}
